@@ -68,7 +68,13 @@ export default function App() {
           {showAddFriend ? 'Close' : 'Add friend'}</Button>
       </div>
 
-      {selectedFriend && <FormSplitBill selectedFriend={selectedFriend} onSplitBill={handleSplitBill} />}
+      {selectedFriend && (
+        <FormSplitBill
+          selectedFriend={selectedFriend}
+          onSplitBill={handleSplitBill}
+          key={selectedFriend.id}
+        />
+      )}
     </div>
   );
 }
@@ -159,6 +165,23 @@ function FormSplitBill({ selectedFriend, onSplitBill }) {
   const paidByFriend = bill ? bill - paidByUser : '';
   const [whoIsPaying, setWhoIsPaying] = useState('user');
 
+  function handleBillChange(e) {
+    const value = e.target.value;
+
+    if (/^\d*$/.test(value)) {
+      setBill(value === "" ? "" : Number(value));
+    }
+  }
+
+  function handlePaidByUserChange(e) {
+    const value = e.target.value;
+
+    if (/^\d*$/.test(value)) {
+      const num = Number(value);
+      if (num <= bill) setPaidByUser(num);
+    }
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
 
@@ -174,13 +197,15 @@ function FormSplitBill({ selectedFriend, onSplitBill }) {
       <input
         type="text"
         value={bill}
-        onChange={e => setBill(Number(e.target.value))} />
+        onChange={handleBillChange}
+      />
 
       <label>🌱 Your expense</label>
       <input
         type="text"
         value={paidByUser}
-        onChange={e => setPaidByUser(Number(e.target.value) > bill ? paidByUser : Number(e.target.value))} />
+        onChange={handlePaidByUserChange}
+      />
 
       <label>🧑‍🤝‍🧑 {selectedFriend.name}'s expense</label>
       <input
